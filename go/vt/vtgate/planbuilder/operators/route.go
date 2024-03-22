@@ -591,7 +591,28 @@ func addColumnToInput(operator ops.Operator, expr *sqlparser.AliasedExpr, addToG
 	case *Limit:
 		return addColumnToInput(op.Source, expr, addToGroupBy)
 	case *Ordering:
+<<<<<<< HEAD
 		return addColumnToInput(op.Source, expr, addToGroupBy)
+=======
+		derivedName, src, added, offset := addMultipleColumnsToInput(ctx, op.Source, reuse, addToGroupBy, exprs)
+		if added {
+			op.Source = src
+		}
+		return derivedName, op, added, offset
+
+	case *LockAndComment:
+		derivedName, src, added, offset := addMultipleColumnsToInput(ctx, op.Source, reuse, addToGroupBy, exprs)
+		if added {
+			op.Source = src
+		}
+		return derivedName, op, added, offset
+
+	case *Horizon:
+		// if the horizon has an alias, then it is a derived table,
+		// we have to add a new projection and can't build on this one
+		return op.Alias, op, false, nil
+
+>>>>>>> b327743a25 (Fix aliasing in routes that have a derived table (#15550))
 	case selectExpressions:
 		if op.isDerived() {
 			// if the only thing we can push to is a derived table,
